@@ -3,6 +3,7 @@ import openai
 from openai import OpenAI
 from pinecone import Pinecone as PineconeClient
 import requests
+from dev_utils.connections import connections
 
 # Show title and description.
 st.title("AdChat Explore")
@@ -10,10 +11,6 @@ st.write(
     "Ask this ad any questions you have!"
 )
 
-def connections(open_ai_key, pinecone_key):
-    pinecone = PineconeClient(api_key=pinecone_key)
-    open_ai_client = OpenAI(api_key=open_ai_key)
-    return open_ai_client, pinecone
 
 def get_embedding(text, open_ai_client, model="text-embedding-3-small"):
    return open_ai_client.embeddings.create(input = [text], model=model).data[0].embedding
@@ -77,7 +74,7 @@ else:
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
             st.markdown(query)
-
+        test_params = st.query_params
         prompt = get_similar("ns1", query, open_ai_client, pinecone)
         stream = get_completion(prompt, openai_api_key)
 

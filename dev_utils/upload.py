@@ -1,7 +1,6 @@
 import os
 from pinecone import Pinecone as PineconeClient
 import requests
-# new
 from openai import OpenAI
 import pandas as pd
 import numpy as np
@@ -35,10 +34,11 @@ def send_data_to_pinecone(data, open_ai_client, pinecone, namespace):
         namespace=namespace
     )
 
-    def run_upload(offers, namespace, open_ai_client, pinecone):
-        data = pd.read_csv(offers)
-        data_strings = []
-        for i, j in data.iterrows():
-            data_strings.append(f"{j['Offer']}. {j['Description']} {j['Location']}. The promotion code is {j['Promotion Codes']}")
-        data_string = ['\n\n'.join(data_strings)]
-        send_data_to_pinecone(data_string, open_ai_client, pinecone, namespace)
+def run_upload(offers, namespace, open_ai_client, pinecone):
+    data = pd.read_csv(offers)
+    data_strings = []
+    for i, j in data.iterrows():
+        data_strings.append(f"{j['Offer']}. {j['Description']} {j['Location']}. The promotion code is {j['Promotion Codes']}")
+    data_string = ['\n\n'.join(data_strings)]
+    send_data_to_pinecone(data_string, open_ai_client, pinecone, namespace)
+    return "SUCCESS"
