@@ -1,6 +1,8 @@
 import os
 import streamlit as st
 from datetime import datetime
+from dev_utils.upload import run_upload
+from dev_utils.connections import connections
 
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
@@ -66,12 +68,16 @@ def save_parameters(params, folder, filename="params.txt"):
 
 def ad_chat_client_portal():
     st.title("AdChat Client Portal")
+    openai_api_key = st.text_input("OpenAI API Key", type="password")
+    pinecone_key = st.text_input("pinecone API Key", type="password")
 
     image_file, image_params = handle_image_upload()
     doc_file = handle_document_upload()
     client_details = handle_client_parameters()
 
     if st.button("Submit"):
+        open_ai_client, pinecone = connections(openai_api_key, pinecone_key)
+
         if image_file and doc_file and client_details['Client Name'] and client_details['Client Email']:
             session_folder = create_session_folder(UPLOAD_DIR)
 
@@ -80,6 +86,7 @@ def ad_chat_client_portal():
                 st.success(f"Image '{image_file.name}' uploaded successfully!")
 
             doc_path = save_uploaded_file(doc_file, session_folder)
+            ret_val = run_upload(doc_path, "random", open_ai_client, pinecone)
             if doc_path:
                 st.success(f"Document '{doc_file.name}' uploaded successfully!")
 
