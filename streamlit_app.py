@@ -19,7 +19,7 @@ def get_embedding(text, open_ai_client, model="text-embedding-3-small"):
    return open_ai_client.embeddings.create(input = [text], model=model).data[0].embedding
 
 def templatize(query, context):
-    return "Answer the question based only on the following context:" + context + "Question: " + query
+    return "Answer the question based only on the following offers by picking one that is most applicable:" + context + "Question: " + query
 
 def get_similar(namespace, query, open_ai_client, pinecone):
     query_embedding = get_embedding(query, open_ai_client, model='text-embedding-3-small')
@@ -39,7 +39,7 @@ def get_completion(prompt, key):
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-        {"role": "system", "content": "You are a sales agent trying to present information regarding a company to someone who clicked an ad."},
+        {"role": "system", "content": "You are a sales agent trying to present information regarding a offers for a company after someone who clicked an ad."},
         {"role": "user", "content": prompt}
         ],
         stream=True
