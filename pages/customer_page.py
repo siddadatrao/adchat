@@ -20,6 +20,13 @@ def get_similar(namespace, query, open_ai_client, pinecone):
 	query_result = query_results1['matches'][0]['metadata']['text']
 	return templatize(query, query_result)
 
+def get_namespace():
+    test_params = st.query_params
+    if "namespace" not in test_params:
+        return "ns1"
+    else:
+        return test_params["namespace"]
+
 def get_completion(prompt, key):
 	openai.api_key = key
 
@@ -60,8 +67,9 @@ def main():
 			st.session_state.messages.append({"role": "user", "content": query})
 			with st.chat_message("user"):
 				st.markdown(query)
-			test_params = st.query_params
-			prompt = get_similar("ns1", query, openai_connection, pinecone_connection)
+				
+			namespace = get_namespace()
+			prompt = get_similar(namespace, query, openai_connection, pinecone_connection)
 			stream = get_completion(prompt, openai_key)
 
 			# # Generate a response using the OpenAI API.

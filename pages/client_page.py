@@ -3,6 +3,8 @@ import streamlit as st
 from datetime import datetime
 from dev_utils.upload import run_upload
 from dev_utils.connections import connections
+import uuid
+
 
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
@@ -66,6 +68,12 @@ def save_parameters(params, folder, filename="params.txt"):
 			f.write("\n")
 	return params_file
 
+def create_url(client_name):
+	c_uuid = uuid.uuid4()
+	client_uid = str(client_name) + str(c_uuid)
+	url_base = "http://localhost:8501/customer_page?namespace=" + client_uid
+	return client_uid, url_base
+
 def ad_chat_client_upload():
 
 	st.title("AdChat Client Portal")
@@ -81,6 +89,7 @@ def ad_chat_client_upload():
 		openai_connection, pinecone_connection, openai_key, pinecone_key = connections()
 
 		if image_file and doc_file and client_details['Client Name'] and client_details['Client Email']:
+
 			session_folder = create_session_folder(UPLOAD_DIR)
 
 			image_path = save_uploaded_file(image_file, session_folder)
@@ -88,7 +97,12 @@ def ad_chat_client_upload():
 				st.success(f"Image '{image_file.name}' uploaded successfully!")
 
 			doc_path = save_uploaded_file(doc_file, session_folder)
-			ret_val = run_upload(doc_path, "random", openai_connection, pinecone_connection)
+
+			# Get current URL and Client UUID to post data to pinecone
+			c_uuid, url = create_url(client_details["Client Name"])
+			ret_val = run_upload(doc_path, c_uuid, openai_connection, pinecone_connection)
+			print(url)
+
 			if doc_path:
 				st.success(f"Document '{doc_file.name}' uploaded successfully!")
 
