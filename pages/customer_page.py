@@ -1,6 +1,6 @@
 import streamlit as st
 import openai
-from dev_utils.connections import connections
+from dev_utils.connections import api_connections, database
 
 def get_embedding(text, open_ai_client, model="text-embedding-3-small"):
 	return open_ai_client.embeddings.create(input = [text], model=model).data[0].embedding
@@ -21,11 +21,11 @@ def get_similar(namespace, query, open_ai_client, pinecone):
 	return templatize(query, query_result)
 
 def get_namespace():
-    test_params = st.query_params
-    if "namespace" not in test_params:
-        return "ns1"
-    else:
-        return test_params["namespace"]
+	test_params = st.query_params
+	if "namespace" not in test_params:
+		return "ns1"
+	else:
+		return test_params["namespace"]
 
 def get_completion(prompt, key):
 	openai.api_key = key
@@ -41,7 +41,7 @@ def get_completion(prompt, key):
 	return response
 
 def main():
-	openai_connection, pinecone_connection, openai_key, pinecone_key = connections()
+	openai_connection, pinecone_connection, openai_key, pinecone_key = api_connections()
 
 	# openai_api_key = st.text_input("OpenAI API Key", type="password")
 	# pinecone_key = st.text_input("pinecone API Key", type="password")

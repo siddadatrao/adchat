@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from datetime import datetime
 from dev_utils.upload import run_upload
-from dev_utils.connections import connections
+from dev_utils.connections import api_connections, database
 import uuid
 
 
@@ -86,7 +86,11 @@ def ad_chat_client_upload():
 	client_details = handle_client_parameters()
 
 	if st.button("Submit"):
-		openai_connection, pinecone_connection, openai_key, pinecone_key = connections()
+		openai_connection, pinecone_connection, openai_key, pinecone_key = api_connections()
+		
+		with database() as (connection, cursor):
+			print("COMPONENT-PATHEON-STATS: Connected to database!")
+			# here I have to write the sql query to upsert the client info to database.
 
 		if image_file and doc_file and client_details['Client Name'] and client_details['Client Email']:
 
