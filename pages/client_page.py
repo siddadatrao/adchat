@@ -104,7 +104,7 @@ def ad_chat_client_upload():
 
 			# Get current URL and Client UUID to post data to pinecone
 			c_uuid, url = create_url(client_details["Client Name"])
-			ret_val = run_upload(doc_path, c_uuid, openai_connection, pinecone_connection)
+			run_upload(doc_path, c_uuid, openai_connection, pinecone_connection)
 			print(url)
 
 			if doc_path:
