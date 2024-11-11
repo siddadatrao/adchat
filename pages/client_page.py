@@ -4,6 +4,7 @@ from datetime import datetime
 from dev_utils.upload import run_upload
 from dev_utils.connections import api_connections, database
 import uuid
+import config
 
 
 UPLOAD_DIR = "uploads"
@@ -71,7 +72,7 @@ def save_parameters(params, folder, filename="params.txt"):
 def create_url(client_name):
 	c_uuid = uuid.uuid4()
 	client_uid = str(client_name) + str(c_uuid)
-	url_base = "http://localhost:8501/customer_page?namespace=" + client_uid
+	url_base = config.BASE_URL + client_uid
 	return client_uid, url_base
 
 def ad_chat_client_upload():
@@ -105,6 +106,7 @@ def ad_chat_client_upload():
 			# Get current URL and Client UUID to post data to pinecone
 			c_uuid, url = create_url(client_details["Client Name"])
 			run_upload(doc_path, c_uuid, openai_connection, pinecone_connection)
+			st.success(f"Share This URL: '{url}")
 			print(url)
 
 			if doc_path:
