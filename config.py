@@ -12,6 +12,7 @@ DB_HOST = st.secrets["POSTGRES_DB_HOST"]
 DB_PORT = st.secrets["POSTGRES_DB_PORT"]
 DB_USER = st.secrets["POSTGRES_DB_USER"]
 DB_PASSWORD = st.secrets["POSTGRES_DB_PASSWORD"]
+BASE_URL = st.secrets["BASE_URL"]
 
 
 # The secrets comes to this file from "secrets.toml".
