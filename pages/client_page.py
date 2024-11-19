@@ -103,6 +103,7 @@ def ad_chat_client_upload():
 			# Get current URL and Client UUID to post data to pinecone
 			client_uuid, url = create_url(client_details["Client Name"])
 			run_upload(doc_path, client_uuid, openai_connection, pinecone_connection)
+			st.success(f"Share This URL: '{url}")
 			print(url)
 
 			if doc_path:
