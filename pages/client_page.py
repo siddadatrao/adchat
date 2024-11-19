@@ -69,6 +69,7 @@ def save_parameters(params, folder, filename="params.txt"):
 	return params_file
 
 def create_url(client_name):
+	"""Utility function to create url along with the uid"""
 	c_uuid = uuid.uuid4()
 	client_uid = str(client_name) + str(c_uuid)
 	url_base = "http://localhost:8501/customer_page?namespace=" + client_uid
@@ -77,9 +78,6 @@ def create_url(client_name):
 def ad_chat_client_upload():
 
 	st.title("AdChat Client Portal")
-
-	# openai_api_key = st.text_input("OpenAI API Key", type="password")
-	# pinecone_key = st.text_input("pinecone API Key", type="password")
 
 	image_file, image_params = handle_image_upload()
 	doc_file = handle_document_upload()
@@ -103,8 +101,8 @@ def ad_chat_client_upload():
 			doc_path = save_uploaded_file(doc_file, session_folder)
 
 			# Get current URL and Client UUID to post data to pinecone
-			c_uuid, url = create_url(client_details["Client Name"])
-			run_upload(doc_path, c_uuid, openai_connection, pinecone_connection)
+			client_uuid, url = create_url(client_details["Client Name"])
+			run_upload(doc_path, client_uuid, openai_connection, pinecone_connection)
 			print(url)
 
 			if doc_path:
@@ -114,7 +112,7 @@ def ad_chat_client_upload():
 				"Image Parameters": image_params,
 				"Client Details": client_details,
 			}
-			params_file = save_parameters(params, session_folder)
+			save_parameters(params, session_folder)
 			st.success("All files and parameters saved successfully!")
 		else:
 			st.error("Please upload both an image and a document, and fill in all client details.")

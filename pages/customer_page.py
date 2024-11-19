@@ -43,9 +43,6 @@ def get_completion(prompt, key):
 def main():
 	openai_connection, pinecone_connection, openai_key, pinecone_key = api_connections()
 
-	# openai_api_key = st.text_input("OpenAI API Key", type="password")
-	# pinecone_key = st.text_input("pinecone API Key", type="password")
-
 	if not openai_connection or not pinecone_connection:
 		st.info("Please add valid OpenAI & Pinecode API keys to continue.", icon="🗝️")
 	else:
