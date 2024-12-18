@@ -1,9 +1,9 @@
-import os
 import streamlit as st
 from datetime import datetime
 from dev_utils.upload import run_upload
 from dev_utils.connections import api_connections, database
-import uuid
+import psycopg2, psycopg2.extras
+import os, uuid
 
 
 UPLOAD_DIR = "uploads"
@@ -54,6 +54,7 @@ def handle_client_parameters():
 	client_details = {}
 	client_details['Client Name'] = st.text_input("Client Name", value="")
 	client_details['Client Email'] = st.text_input("Client Email", value="")
+	client_details['Client Phone'] = st.text_input("Client Phone", value="")
 	client_details['Upload Date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	return client_details
 
@@ -71,9 +72,9 @@ def save_parameters(params, folder, filename="params.txt"):
 def create_url(client_name):
 	"""Utility function to create url along with the uid"""
 	c_uuid = uuid.uuid4()
-	client_uid = str(client_name) + str(c_uuid)
-	url_base = "http://localhost:8501/customer_page?namespace=" + client_uid
-	return client_uid, url_base
+	client_uuid = str(client_name) + str(c_uuid)
+	url_base = "http://localhost:8501/customer_page?namespace=" + client_uuid
+	return client_uuid, url_base
 
 def ad_chat_client_upload():
 
@@ -85,10 +86,6 @@ def ad_chat_client_upload():
 
 	if st.button("Submit"):
 		openai_connection, pinecone_connection, openai_key, pinecone_key = api_connections()
-		
-		with database() as (connection, cursor):
-			print("COMPONENT-PATHEON-STATS: Connected to database!")
-			# here I have to write the sql query to upsert the client info to database.
 
 		if image_file and doc_file and client_details['Client Name'] and client_details['Client Email']:
 
@@ -112,9 +109,30 @@ def ad_chat_client_upload():
 			params = {
 				"Image Parameters": image_params,
 				"Client Details": client_details,
+				"Client_Customer_Link": {'Client_UUID': client_uuid, 'Client_URL': url}
 			}
 			save_parameters(params, session_folder)
 			st.success("All files and parameters saved successfully!")
+
+			if len(params) > 0:
+				records = [(params['Client_Customer_Link']['Client_UUID'], 
+							params['Client Details']['Client Name'], 
+							params['Client Details']['Client Phone'], 
+							params['Client Details']['Client Email'])]
+				
+				with database() as (connection, cursor):
+					psycopg2.extras.execute_values(cursor, """
+						INSERT INTO client_info
+							(uuid, client_name, client_phone, client_email)
+						VALUES %s
+						ON CONFLICT ON CONSTRAINT unq_constraint_uuid_client_name
+						DO UPDATE
+						SET 
+							client_phone = EXCLUDED.client_phone,
+							client_email = EXCLUDED.client_email
+						""", records
+					)
+					connection.commit()
 		else:
 			st.error("Please upload both an image and a document, and fill in all client details.")
 
