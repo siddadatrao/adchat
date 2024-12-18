@@ -18,9 +18,12 @@ def database():
 									host = config.DB_HOST, 
 									port = config.DB_PORT, 
 									user = config.DB_USER, 
-									password = config.DB_PASSWORD
+									password = config.DB_PASSWORD,
+									database = config.DB_DATABASE
 								)
 	cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+	if cursor:
+		print("COMPONENT-PATHEON-STATS: Connected to database!")
 	try:
 		yield connection, cursor
 	finally:
